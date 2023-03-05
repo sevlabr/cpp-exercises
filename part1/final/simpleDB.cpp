@@ -1,4 +1,3 @@
-// –еализуйте функции и методы классов и при необходимости добавьте свои
 #include <iostream>
 #include <string>
 #include <vector>
@@ -12,30 +11,30 @@ using namespace std;
 
 class Date {
 public:
-  Date() {
-	  year = 0;
-	  month = 0;
-	  day = 0;
-  }
-  Date(const int& y, const int& m, const int& d) {
-	  year = y;
-	  month = m;
-	  day = d;
-  }
-  int GetYear() const {
-	  return year;
-  }
-  int GetMonth() const {
-	  return month;
-  }
-  int GetDay() const {
-	  return day;
-  }
+	Date() {
+		year = 0;
+		month = 0;
+		day = 0;
+	}
+	Date(const int& y, const int& m, const int& d) {
+		year = y;
+		month = m;
+		day = d;
+	}
+	int GetYear() const {
+		return year;
+	}
+	int GetMonth() const {
+		return month;
+	}
+	int GetDay() const {
+		return day;
+	}
 
 private:
-  int year;
-  int month;
-  int day;
+	int year;
+	int month;
+	int day;
 };
 
 bool operator < (const Date& lhs, const Date& rhs) {
@@ -56,6 +55,7 @@ void EnsureDateFormat(const int& month, const int& day) {
 	}
 }
 
+// TODO: rewrite
 istream& operator >> (istream& stream, Date& date) {
 	if (stream) {
 		int year;
@@ -68,15 +68,12 @@ istream& operator >> (istream& stream, Date& date) {
 						stream.ignore(1);
 						int day;
 						if (stream >> day) {
-							// €вл€етс€ ли это условие правильным?
 							if (stream.peek() == EOF) {
-							//if (!stream) {
 								EnsureDateFormat(month, day);
 								date = {year, month, day};
 							} else {
 								throw invalid_argument("Wrong date format: ");
 							}
-							// конец потенциально проблемного блока
 						} else {
 							throw invalid_argument("Wrong date format: ");
 						}
@@ -105,56 +102,55 @@ ostream& operator << (ostream& stream, const Date& date) {
 
 class Database {
 public:
-  void AddEvent(const Date& date, const string& event) {
-	  data[date].insert(event);
-  }
+	void AddEvent(const Date& date, const string& event) {
+		data[date].insert(event);
+	}
 
-  bool DeleteEvent(const Date& date, const string& event) {
-	  // .at returns out_of_range exception if data.at(date) is not found
-	  try {
-		  if (data.at(date).count(event) == 0) {
-			  return false;
-		  } else {
-			  data.at(date).erase(event);
-			  return true;
-		  }
-	  } catch (const out_of_range&) {
-		  //cout << "Date is not found (out_of_range .at exception)" << endl;
-		  return false;
-	  }
-  }
+	bool DeleteEvent(const Date& date, const string& event) {
+		// .at returns out_of_range exception if data.at(date) is not found
+		try {
+			if (data.at(date).count(event) == 0) {
+				return false;
+			} else {
+				data.at(date).erase(event);
+				return true;
+			}
+		} catch (const out_of_range&) {
+			//cout << "Date is not found (out_of_range .at exception)" << endl;
+			return false;
+		}
+	}
 
-  int  DeleteDate(const Date& date) {
-	  try {
-		  int size = data.at(date).size();
-		  data.erase(date);
-		  return size;
-	  } catch (const out_of_range&) {
-		  return 0;
-	  }
-  }
+	int  DeleteDate(const Date& date) {
+		try {
+			int size = data.at(date).size();
+			data.erase(date);
+			return size;
+		} catch (const out_of_range&) {
+			return 0;
+		}
+	}
 
-  /* ??? (€вл€етс€ ли возвращаемое значение правильным?) */
-  void Find(const Date& date) const {
-	  try {
-		  for (const string& event : data.at(date)) {
-			  cout << event << endl;
-		  }
-	  } catch (const out_of_range&) {
-		  //cout << "Date is not found (out_of_range .at exception)" << endl;
-	  }
-  }
+	void Find(const Date& date) const {
+		try {
+			for (const string& event : data.at(date)) {
+				cout << event << endl;
+			}
+		} catch (const out_of_range&) {
+			//cout << "Date is not found (out_of_range .at exception)" << endl;
+		}
+	}
 
-  void Print() const {
-	  for (const auto& [date, events] : data) {
-		  for (const string& event : events) {
-			  cout << date << " " << event << endl;
-		  }
-	  }
-  }
+	void Print() const {
+		for (const auto& [date, events] : data) {
+			for (const string& event : events) {
+				cout << date << " " << event << endl;
+			}
+		}
+	}
 
 private:
-  map<Date, set<string>> data;
+	map<Date, set<string>> data;
 };
 
 vector<string> ParseCommand(stringstream& stream) {
@@ -168,95 +164,94 @@ vector<string> ParseCommand(stringstream& stream) {
 
 
 int main() {
-  Database db;
+	Database db;
 
-  string command;
-  while (getline(cin, command)) {
-    // —читайте команды с потока ввода и обработайте каждую
-	  stringstream stream(command);
-	  if (command != "") {
-		  const vector<string> command_items = ParseCommand(stream);
-		  const string command_code = command_items.front();
+	string command;
+	while (getline(cin, command)) {
+		stringstream stream(command);
+		if (command != "") {
+			const vector<string> command_items = ParseCommand(stream);
+			const string command_code = command_items.front();
 
-		  if (command_code == "Add") {
-			  const string new_date = command_items[1];
-			  stringstream stream(new_date);
-			  Date date;
-			  try {
-				  stream >> date;
-			  } catch (const invalid_argument& ex) {
-				  cout << ex.what() << new_date << endl;
-				  return 2;
-			  } catch (const out_of_range& ex) {
-				  cout << ex.what() << endl;
-				  return 3;
-			  }
-			  const string new_event = command_items[2];
-			  db.AddEvent(date, new_event);
+			if (command_code == "Add") {
+				const string new_date = command_items[1];
+				stringstream stream(new_date);
+				Date date;
+				try {
+					stream >> date;
+				} catch (const invalid_argument& ex) {
+					cout << ex.what() << new_date << endl;
+					return 2;
+				} catch (const out_of_range& ex) {
+					cout << ex.what() << endl;
+					return 3;
+				}
+				const string new_event = command_items[2];
+				db.AddEvent(date, new_event);
 
-		  } else if (command_code == "Find") {
-			  const string considering_date = command_items[1];
-			  stringstream stream(considering_date);
-			  Date date;
-			  try {
-				  stream >> date;
-			  } catch (const invalid_argument& ex) {
-				  cout << ex.what() << considering_date << endl;
-				  return 2;
-			  } catch (const out_of_range& ex) {
-				  cout << ex.what() << endl;
-				  return 3;
-			  }
-			  db.Find(date);
+			} else if (command_code == "Find") {
+				const string considering_date = command_items[1];
+				stringstream stream(considering_date);
+				Date date;
+				try {
+					stream >> date;
+				} catch (const invalid_argument& ex) {
+					cout << ex.what() << considering_date << endl;
+					return 2;
+				} catch (const out_of_range& ex) {
+					cout << ex.what() << endl;
+					return 3;
+				}
+				db.Find(date);
 
-		  } else if (command_code == "Print") {
-			  db.Print();
+			} else if (command_code == "Print") {
+				db.Print();
 
-		  } else if (command_code == "Del") {
-			  if (command_items.size() == 2) {
-				  const string considering_date = command_items[1];
-				  stringstream stream(considering_date);
-				  Date date;
-				  try {
-					  stream >> date;
-				  } catch (const invalid_argument& ex) {
-					  cout << ex.what() << considering_date << endl;
-					  return 2;
-				  } catch (const out_of_range& ex) {
-					  cout << ex.what() << endl;
-					  return 3;
-				  }
-				  cout << "Deleted " << db.DeleteDate(date) << " events" << endl;
+			} else if (command_code == "Del") {
+				if (command_items.size() == 2) {
+					const string considering_date = command_items[1];
+					stringstream stream(considering_date);
+					Date date;
+					try {
+						stream >> date;
+					} catch (const invalid_argument& ex) {
+						cout << ex.what() << considering_date << endl;
+						return 2;
+					} catch (const out_of_range& ex) {
+						cout << ex.what() << endl;
+						return 3;
+					}
+					cout << "Deleted " << db.DeleteDate(date) << " events" << endl;
 
-			  } else {
-				  const string considering_date = command_items[1];
-				  stringstream stream(considering_date);
-				  Date date;
-				  try {
-					  stream >> date;
-				  } catch (const invalid_argument& ex) {
-				  	  cout << ex.what() << considering_date << endl;
-				  	  return 2;
-				  } catch (const out_of_range& ex) {
-				  	  cout << ex.what() << endl;
-				  	  return 3;
-				  }
-				  string event = command_items[2];
-				  if (db.DeleteEvent(date, event)) {
-					  cout << "Deleted successfully" << endl;
-				  } else {
-					  cout << "Event not found" << endl;
-				  }
-			  }
+				} else {
+					const string considering_date = command_items[1];
+					stringstream stream(considering_date);
+					Date date;
+					try {
+						stream >> date;
+					} catch (const invalid_argument& ex) {
+						cout << ex.what() << considering_date << endl;
+						return 2;
+					} catch (const out_of_range& ex) {
+						cout << ex.what() << endl;
+						return 3;
+					}
+					string event = command_items[2];
+					if (db.DeleteEvent(date, event)) {
+						cout << "Deleted successfully" << endl;
+					} else {
+						cout << "Event not found" << endl;
+					}
+				}
 
-		  } else {
-			  cout << "Unknown command: " << command_code << endl;
-			  return 1;
-		  }
-	  }
-  }
+			} else {
+				cout << "Unknown command: " << command_code << endl;
+				return 1;
+			}
+		}
+	}
 
-  return 0;
+	return 0;
 }
 
 /*#include <iomanip>
@@ -272,7 +267,6 @@ using namespace std;
 
 class Date {
 public:
-  // конструктор выбрасывает исключение, если его аргументы некорректны
   Date(int new_year, int new_month, int new_day) {
     year = new_year;
     if (new_month > 12 || new_month < 1) {
@@ -301,15 +295,11 @@ private:
   int day;
 };
 
-// определить сравнение дл€ дат необходимо дл€ использовани€ их в качестве ключей словар€
 bool operator<(const Date& lhs, const Date& rhs) {
-  // воспользуемс€ тем фактом, что векторы уже можно сравнивать на <:
-  // создадим вектор из года, мес€ца и дн€ дл€ каждой даты и сравним их
   return vector<int>{lhs.GetYear(), lhs.GetMonth(), lhs.GetDay()} <
       vector<int>{rhs.GetYear(), rhs.GetMonth(), rhs.GetDay()};
 }
 
-// даты будут по умолчанию выводитьс€ в нужном формате
 ostream& operator<<(ostream& stream, const Date& date) {
   stream << setw(4) << setfill('0') << date.GetYear() <<
       "-" << setw(2) << setfill('0') << date.GetMonth() <<
